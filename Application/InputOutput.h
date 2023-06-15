@@ -16,8 +16,8 @@ typedef struct{
 }_Outputs;
 extern _Outputs Outputs;
 
-#define USERLED_PORT			GPIOB
-#define USERLED_PIN				GPIO_PIN_3
+#define USERLED_PORT			GPIOC
+#define USERLED_PIN				GPIO_PIN_13
 #define USERLED					Outputs.userLed
 
 void OutputProcess();
