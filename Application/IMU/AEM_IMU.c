@@ -6,7 +6,7 @@
  */
 
 #include "AEM_IMU.h"
-#include "InputOutput.h"
+#include "../InputOutput/InputOutput.h"
 
 _AEM_IMU AEM_IMU;
 
