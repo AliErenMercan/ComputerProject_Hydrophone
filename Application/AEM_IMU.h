@@ -15,14 +15,14 @@
 #define			IMU_TASK_HZ			50
 #define 		IMU_I2C_TIMEOUT		(IMU_TASK_HZ >> 1)
 
-extern I2C_HandleTypeDef hi2c1;
-#define			IMU_I2C_PORT	hi2c1
+extern I2C_HandleTypeDef 			hi2c2;
+#define			IMU_I2C_PORT		hi2c2
 
 #define IMU_RESET_PORT				GPIOB
-#define IMU_RESET_PIN				GPIO_PIN_5
+#define IMU_RESET_PIN				GPIO_PIN_8
 
-#define I2C_SHIFTER_EN_PORT			GPIOB
-#define I2C_SHIFTER_EN_PIN			GPIO_PIN_5
+#define I2C_SHIFTER_EN_PORT			GPIOC
+#define I2C_SHIFTER_EN_PIN			GPIO_PIN_14
 
 
 
