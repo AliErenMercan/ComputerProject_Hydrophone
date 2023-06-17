@@ -18,6 +18,8 @@ void Application(){
 
 	AEM_IMU_Init();
 	UartInit();
+	AudioSignalControlInit();
+
 	while(1){
 
 		if(Tasks.IO > IO_TASK_RATE){
@@ -32,6 +34,12 @@ void Application(){
 		if(Tasks.BNO055 > BNO055_TASK_RATE){
 			Tasks.BNO055 = 0;
 			IMU_Process();
+		}
+
+		if(Tasks.HYDROPHONE > HP_TASK_RATE)
+		{
+			Tasks.HYDROPHONE = 0;
+			AudioSignalProcess();
 		}
 	}
 }

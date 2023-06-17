@@ -14,12 +14,14 @@
 
 enum{
 	IO_TASK_RATE = CAL(10),
-	BNO055_TASK_RATE = CAL(50)
+	BNO055_TASK_RATE = CAL(50),
+	HP_TASK_RATE = CAL(100)
 };
 
 typedef struct {
 	uint32_t IO;
 	uint32_t BNO055;
+	uint32_t HYDROPHONE;
 }_Tasks;
 extern _Tasks Tasks;
 
