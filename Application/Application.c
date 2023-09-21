@@ -12,7 +12,8 @@
 #include "InputOutput/InputOutput.h"
 #include "Communication/FK_Uart.h"
 
-uint8_t txBuffer[5] = "OK\n";
+uint8_t txBuffer[8] = {0x55, 1, 2, 3, 4, 5, 6, 0};
+uint32_t checksumZartZurt = 0;
 
 void Application(){
 
@@ -21,14 +22,12 @@ void Application(){
 	AudioSignalControlInit();
 
 	while(1){
-
 		if(Tasks.IO > IO_TASK_RATE){
 			Tasks.IO = 0;
 
 			USERLED = (IMU_ONCE_READ == IMU_ONCE_READED) ? USERLED ^ 1 : 0;
 			OutputProcess();
 
-			HAL_UART_Transmit_IT(&huart1, txBuffer, 5);
 		}
 
 		if(Tasks.BNO055 > BNO055_TASK_RATE){

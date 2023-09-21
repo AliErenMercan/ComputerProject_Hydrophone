@@ -42,6 +42,7 @@ typedef struct
 	uint32_t HP_ArrivedDifferenceValue;
 	uint32_t HP_LeftComeSignalCounter;
 	uint32_t HP_RightComeSignalCounter;
+	int16_t HP_SignalSourceAngle;
 
 }HP_LastSignalDetails_t;
 
@@ -53,6 +54,8 @@ typedef struct
 	HP_Status_t oStatus;
 	uint32_t HP_DelayCounter;
 	HP_LastSignalDetails_t HP_LastSignalDetails;
+	uint16_t HP_DynamicLeftMax;
+	uint16_t HP_DynamicRightMax;
 }AEM_AudioSignalControl_t;
 extern AEM_AudioSignalControl_t AEM_AudioSignalControl;
 
@@ -63,7 +66,11 @@ extern AEM_AudioSignalControl_t AEM_AudioSignalControl;
 #define HP_DIFFERENCE_VALUE		AEM_AudioSignalControl.HP_LastSignalDetails.HP_ArrivedDifferenceValue
 #define HP_LEFT_COME_COUNTER	AEM_AudioSignalControl.HP_LastSignalDetails.HP_LeftComeSignalCounter
 #define HP_RIGHT_COME_COUNTER	AEM_AudioSignalControl.HP_LastSignalDetails.HP_RightComeSignalCounter
+#define HP_SIGNAL_ANGLE			AEM_AudioSignalControl.HP_LastSignalDetails.HP_SignalSourceAngle
 
+#define HP_CONSTANT_MAX			350
+#define HP_DYNAMIC_LEFT_MAX		AEM_AudioSignalControl.HP_DynamicLeftMax
+#define HP_DYNAMIC_RIGHT_MAX	AEM_AudioSignalControl.HP_DynamicRightMax
 void AudioSignalControlInit();
 void SignalPendingTimeoutCallback();
 void LEFT_EXTI_Arrived();

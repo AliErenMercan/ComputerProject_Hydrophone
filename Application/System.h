@@ -13,7 +13,7 @@
 #define CAL(x)				((SYSTEM_HZ/(x)) - 1)
 
 enum{
-	IO_TASK_RATE = CAL(10),
+	IO_TASK_RATE = CAL(1),
 	BNO055_TASK_RATE = CAL(50),
 	HP_TASK_RATE = CAL(100)
 };

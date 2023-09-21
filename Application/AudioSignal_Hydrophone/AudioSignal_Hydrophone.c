@@ -6,6 +6,8 @@
  */
 
 #include "AudioSignal_Hydrophone.h"
+#include "../IMU/AEM_IMU.h"
+#include "../Communication/FK_Uart.h"
 AEM_AudioSignalControl_t AEM_AudioSignalControl = {0};
 
 void AudioSignalControlInit()
@@ -81,6 +83,35 @@ void RIGHT_EXTI_Arrived()
 	}
 }
 
+typedef union
+{
+	struct{
+		uint8_t header;
+		uint8_t cmd;
+		int16_t imu;
+		int16_t sound;
+		uint8_t checksum;
+	};
+	uint8_t protocol[7];
+}Protocol;
+
+void sendDatum(uint8_t cmd)
+{
+	static Protocol sendProtocol;
+	sendProtocol.header = 0x55;
+	sendProtocol.cmd = cmd;
+	sendProtocol.imu = AEM_IMU.BNO055_Addr->ProcessedEuler.Yaw_Axis;
+	sendProtocol.sound = AEM_AudioSignalControl.HP_LastSignalDetails.HP_SignalSourceAngle;
+
+	uint16_t checksumZartZurt = 0;
+	for(uint8_t i = 0; i < 6; i++)
+	{
+		checksumZartZurt += sendProtocol.protocol[i];
+	}
+	sendProtocol.checksum = checksumZartZurt % 0xFF;
+	HAL_UART_Transmit_IT(&huart1, sendProtocol.protocol, 7);
+}
+
 void AudioSignalProcess()
 {
 	if(HP_STATUS == HP_IDLE)
@@ -93,6 +124,7 @@ void AudioSignalProcess()
 			HP_RIGHT_COME_COUNTER = 0;
 
 		}
+		sendDatum(0);
 		HP_OLD_STATUS = HP_STATUS;
 	}
 	else if(HP_STATUS == HP_PENDING)
@@ -102,8 +134,35 @@ void AudioSignalProcess()
 	}
 	else if(HP_STATUS == HP_STOPPED)
 	{
-		//CALCULATE
 
+		if(HP_DIFFERENCE_VALUE > HP_CONSTANT_MAX)
+		{
+			HP_SIGNAL_ANGLE = -1;
+			HP_STATUS = HP_ERROR;
+			sendDatum(0);
+		}
+		else if(AEM_AudioSignalControl.HP_LastSignalDetails.HP_FirstSignalCome == LEFT_SIGNAL)
+		{
+			if(HP_DIFFERENCE_VALUE > HP_DYNAMIC_LEFT_MAX)
+			{
+				HP_DYNAMIC_LEFT_MAX = HP_DIFFERENCE_VALUE;
+			}
+			HP_SIGNAL_ANGLE = 9000 / (HP_DYNAMIC_LEFT_MAX + 1);
+			HP_SIGNAL_ANGLE = HP_SIGNAL_ANGLE * HP_DIFFERENCE_VALUE;
+			HP_SIGNAL_ANGLE /= 100;
+			sendDatum(HP_FIRST_COME);
+		}
+		else if(AEM_AudioSignalControl.HP_LastSignalDetails.HP_FirstSignalCome == RIGHT_SIGNAL)
+		{
+			if(HP_DIFFERENCE_VALUE > HP_DYNAMIC_RIGHT_MAX)
+			{
+				HP_DYNAMIC_RIGHT_MAX = HP_DIFFERENCE_VALUE;
+			}
+			HP_SIGNAL_ANGLE = 9000 / (HP_DYNAMIC_RIGHT_MAX + 1);
+			HP_SIGNAL_ANGLE = HP_SIGNAL_ANGLE * HP_DIFFERENCE_VALUE;
+			HP_SIGNAL_ANGLE /= 100;
+			sendDatum(HP_FIRST_COME);
+		}
 		HP_DELAY_COUNTER = 1000;
 		HP_OLD_STATUS = HP_STATUS;
 		HP_STATUS = HP_DELAY;
@@ -126,6 +185,7 @@ void AudioSignalProcess()
 		{
 			HP_STATUS = HP_IDLE;
 		}
+		sendDatum(0);
 	}
 	else
 	{
